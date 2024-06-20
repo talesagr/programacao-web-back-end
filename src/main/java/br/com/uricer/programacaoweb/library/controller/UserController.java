@@ -20,7 +20,7 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping("/register")
+    @PostMapping("/users")
     public ResponseEntity<UserDTO> register(@RequestBody UserDTO userData){
         this.userService.register(userData);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -35,6 +35,12 @@ public class UserController {
     @DeleteMapping("/users/{id}")
     public ResponseEntity<UserDTO> delete(@PathVariable Integer id){
         this.userService.deleteByID(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<UserDTO> update(@PathVariable Integer id, @RequestBody UserDTO userData){
+        this.userService.updateUserByID(id, userData);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -10,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -19,6 +18,7 @@ public class UserService {
     UserRepository userRepository;
 
     public void register(UserDTO userData) {
+        System.out.println(userData);
         if (!isValidEmail(userData.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid email");
         }
@@ -49,5 +49,26 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "User does not exist!");
         }
         this.userRepository.deleteById(user.get().getId());
+    }
+
+    public void updateUserByID(Integer id, UserDTO userData) {
+        Optional<User> optionalUser = this.userRepository.findById(id);
+        if (optionalUser.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "User does not exist!");
+        }
+        User user = optionalUser.get();
+        if(!user.getEmail().equals(userData.getEmail())) {
+            user.setEmail(userData.getEmail());
+        }
+        if(!user.getName().equals(userData.getName())) {
+            user.setName(userData.getName());
+        }
+        if(!user.getPassword().equals(userData.getPassword())) {
+            user.setPassword(userData.getPassword());
+        }
+        if(!user.isAdmin() == userData.isAdmin()) {
+            user.setAdmin(userData.isAdmin());
+        }
+        this.userRepository.save(user);
     }
 }
