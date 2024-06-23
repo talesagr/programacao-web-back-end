@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "author")
@@ -30,6 +31,9 @@ public class Author {
 
     @Column(name = "nationality")
     private String nationality;
+
+    @OneToMany(mappedBy = "author")
+    private List<AuthorBook> authorBooks;
 
     public AuthorDTO toDTO() {
         return AuthorDTO.builder()

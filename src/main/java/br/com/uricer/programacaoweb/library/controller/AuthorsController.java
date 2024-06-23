@@ -19,6 +19,7 @@ public class AuthorsController {
 
     @PostMapping
     public ResponseEntity<AuthorDTO> createAuthor(@RequestBody AuthorDTO authorDTO) {
+        System.out.println(authorDTO.toString());
         return ResponseEntity.status(HttpStatus.CREATED).body(authorService.createAuthor(authorDTO));
     }
 

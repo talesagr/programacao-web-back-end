@@ -17,6 +17,7 @@ public class AuthorService {
     private AuthorRepository authorRepository;
 
     public AuthorDTO createAuthor(AuthorDTO authorDTO) {
+        System.out.println(authorDTO.toString());
         return authorRepository.save(authorDTO.toEntity()).toDTO();
     }
 
@@ -49,5 +50,10 @@ public class AuthorService {
 
         authorRepository.delete(author);
     }
+
+    public List<Author> findAuthorsByBookId(Integer bookId) {
+        return authorRepository.findAuthorsByBookId(bookId);
+    }
+
 
 }

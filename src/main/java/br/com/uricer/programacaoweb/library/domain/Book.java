@@ -4,6 +4,8 @@ import br.com.uricer.programacaoweb.library.dto.BookDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "book")
 @Builder
@@ -31,6 +33,9 @@ public class Book {
 
     @Column(name = "stock_quantity")
     private Float stockQuantity;
+
+    @OneToMany(mappedBy = "book")
+    private List<AuthorBook> authorBooks;
 
     public BookDTO toDTO() {
         return BookDTO.builder()
