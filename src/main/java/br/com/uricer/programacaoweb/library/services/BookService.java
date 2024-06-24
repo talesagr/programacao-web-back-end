@@ -1,7 +1,9 @@
 package br.com.uricer.programacaoweb.library.services;
 
+import br.com.uricer.programacaoweb.library.domain.Author;
 import br.com.uricer.programacaoweb.library.domain.AuthorBook;
 import br.com.uricer.programacaoweb.library.domain.Book;
+import br.com.uricer.programacaoweb.library.dto.AuthorDTO;
 import br.com.uricer.programacaoweb.library.dto.BookDTO;
 import br.com.uricer.programacaoweb.library.exceptions.BookNotFound;
 import br.com.uricer.programacaoweb.library.repository.AuthorBookRepository;
@@ -52,6 +54,14 @@ public class BookService {
         book.setGenre(bookDTO.getGenre());
         book.setStockQuantity(bookDTO.getStockQuantity());
 
+        List<AuthorBook> authorBooks = bookDTO.getAuthors().stream().map(authorId -> {
+            Author author = new Author();
+            author.setId(authorId);
+            return AuthorBook.builder().author(author).book(book).build();
+        }).collect(Collectors.toList());
+
+        book.setAuthorBooks(authorBooks);
+
         return bookRepository.save(book).toDTO();
     }
 
@@ -65,7 +75,4 @@ public class BookService {
         bookRepository.delete(book);
     }
 
-    public List<Book> findBookByAuthorId(Integer authorId) {
-        return bookRepository.findBooksByAuthorId(authorId);
-    }
 }
