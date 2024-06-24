@@ -8,11 +8,14 @@ import br.com.uricer.programacaoweb.library.dto.BookDTO;
 import br.com.uricer.programacaoweb.library.exceptions.AuthorNotFound;
 import br.com.uricer.programacaoweb.library.repository.AuthorRepository;
 import br.com.uricer.programacaoweb.library.repository.BookRepository;
+import br.com.uricer.programacaoweb.library.repository.AuthorBookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,9 +27,34 @@ public class AuthorService {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private AuthorBookRepository authorBookRepository;
+
     public AuthorDTO createAuthor(AuthorDTO authorDTO) {
         Author author = authorDTO.toEntity();
-        return authorRepository.save(author).toDTO();
+        author = authorRepository.save(author);
+        return author.toDTO();
+    }
+
+    public AuthorDTO addBooksToAuthor(Integer authorId, List<Integer> bookIds) {
+        Author author = authorRepository.findById(authorId).orElseThrow(AuthorNotFound::new);
+
+        if (bookIds != null && !bookIds.isEmpty()) {
+            Author finalAuthor = author;
+            List<AuthorBook> authorBooks = bookIds.stream()
+                    .map(bookId -> {
+                        Book book = bookRepository.findById(bookId)
+                                .orElseThrow(() -> new RuntimeException("Book not found: " + bookId));
+                        return AuthorBook.builder().author(finalAuthor).book(book).build();
+                    })
+                    .collect(Collectors.toList());
+            author.getAuthorBooks().addAll(authorBooks);
+        }
+
+        author = authorRepository.save(author);
+        AuthorDTO resultDTO = author.toDTO();
+        resultDTO.setBooks(bookIds != null ? bookIds : new ArrayList<>());
+        return resultDTO;
     }
 
     public List<AuthorDTO> getAuthors() {
@@ -34,7 +62,14 @@ public class AuthorService {
         List<Author> authors = authorRepository.findAll();
 
         for (Author author : authors) {
-            authorDTOS.add(author.toDTO());
+            AuthorDTO authorDTO = author.toDTO();
+            List<Integer> bookIds = author.getAuthorBooks() != null ?
+                    author.getAuthorBooks().stream()
+                            .map(ab -> ab.getBook().getId())
+                            .collect(Collectors.toList()) :
+                    new ArrayList<>();
+            authorDTO.setBooks(bookIds);
+            authorDTOS.add(authorDTO);
         }
 
         return authorDTOS;
@@ -49,18 +84,9 @@ public class AuthorService {
         author.setBirthDate(authorDTO.getBirthDate());
         author.setNationality(authorDTO.getNationality());
 
-        if (authorDTO.getBooks() != null && !authorDTO.getBooks().isEmpty()) {
-            List<AuthorBook> authorBooks = authorDTO.getBooks().stream()
-                    .map(bookId -> {
-                        Book book = bookRepository.findById(bookId)
-                                .orElseThrow(() -> new RuntimeException("Book not found: " + bookId));
-                        return AuthorBook.builder().author(author).book(book).build();
-                    })
-                    .collect(Collectors.toList());
-            author.setAuthorBooks(authorBooks);
-        }
-
-        return authorRepository.save(author).toDTO();
+        author = authorRepository.save(author);
+        AuthorDTO resultDTO = author.toDTO();
+        return resultDTO;
     }
 
     public void deleteAuthor(Integer authorId) {
@@ -72,12 +98,23 @@ public class AuthorService {
 
     public List<AuthorDTO> findAuthorsByBookId(Integer bookId) {
         List<Author> authors = authorRepository.findAuthorsByBookId(bookId);
-        return authors.stream().map(Author::toDTO).collect(Collectors.toList());
+        return authors.stream().map(author -> {
+            AuthorDTO authorDTO = author.toDTO();
+            List<Integer> bookIds = author.getAuthorBooks() != null ?
+                    author.getAuthorBooks().stream()
+                            .map(ab -> ab.getBook().getId())
+                            .collect(Collectors.toList()) :
+                    new ArrayList<>();
+            authorDTO.setBooks(bookIds);
+            return authorDTO;
+        }).collect(Collectors.toList());
     }
 
     public List<BookDTO> findBooksByAuthorId(Integer authorId) {
         Author author = authorRepository.findById(authorId).orElseThrow(AuthorNotFound::new);
-        List<Book> books = author.getAuthorBooks().stream().map(AuthorBook::getBook).collect(Collectors.toList());
-        return books.stream().map(Book::toDTO).collect(Collectors.toList());
+        Set<Book> uniqueBooks = new HashSet<>(author.getAuthorBooks().stream()
+                .map(AuthorBook::getBook)
+                .collect(Collectors.toSet()));
+        return uniqueBooks.stream().map(Book::toDTO).collect(Collectors.toList());
     }
 }

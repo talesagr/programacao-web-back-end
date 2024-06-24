@@ -23,14 +23,14 @@ public class AuthorsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(authorService.createAuthor(authorDTO));
     }
 
+    @PutMapping("/{authorId}/books")
+    public ResponseEntity<AuthorDTO> addBooksToAuthor(@PathVariable Integer authorId, @RequestBody List<Integer> bookIds) {
+        return ResponseEntity.status(HttpStatus.OK).body(authorService.addBooksToAuthor(authorId, bookIds));
+    }
+
     @GetMapping
     public ResponseEntity<List<AuthorDTO>> getAuthors() {
         return ResponseEntity.ok().body(authorService.getAuthors());
-    }
-
-    @GetMapping(path = "/{authorId}/books")
-    public ResponseEntity<List<BookDTO>> getBooksByAuthorId(@PathVariable Integer authorId) {
-        return ResponseEntity.ok().body(authorService.findBooksByAuthorId(authorId));
     }
 
     @PutMapping(path = "/{authorId}")
@@ -41,5 +41,10 @@ public class AuthorsController {
     @DeleteMapping(path = "/{authorId}")
     public void deleteAuthor(@PathVariable Integer authorId) {
         authorService.deleteAuthor(authorId);
+    }
+
+    @GetMapping("/{authorId}/books")
+    public ResponseEntity<List<BookDTO>> getBooksByAuthor(@PathVariable Integer authorId) {
+        return ResponseEntity.ok().body(authorService.findBooksByAuthorId(authorId));
     }
 }

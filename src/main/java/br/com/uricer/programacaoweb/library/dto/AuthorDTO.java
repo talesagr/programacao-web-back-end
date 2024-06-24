@@ -3,15 +3,20 @@ package br.com.uricer.programacaoweb.library.dto;
 import br.com.uricer.programacaoweb.library.domain.Author;
 import br.com.uricer.programacaoweb.library.domain.AuthorBook;
 import br.com.uricer.programacaoweb.library.domain.Book;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AuthorDTO {
 
     private Integer id;
@@ -37,8 +42,11 @@ public class AuthorDTO {
                 return AuthorBook.builder().author(author).book(book).build();
             }).collect(Collectors.toList());
             author.setAuthorBooks(authorBooks);
+        } else {
+            author.setAuthorBooks(new ArrayList<>());
         }
 
         return author;
     }
+
 }

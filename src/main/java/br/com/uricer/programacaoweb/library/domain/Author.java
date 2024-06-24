@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "author")
@@ -32,16 +34,22 @@ public class Author {
     @Column(name = "nationality")
     private String nationality;
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AuthorBook> authorBooks;
 
     public AuthorDTO toDTO() {
+        List<Integer> bookIds = authorBooks != null ?
+                authorBooks.stream()
+                        .map(authorBook -> authorBook.getBook().getId())
+                        .collect(Collectors.toList()) :
+                new ArrayList<>();
         return AuthorDTO.builder()
                 .id(id)
                 .name(name)
                 .bio(bio)
                 .birthDate(birthDate)
-                .nationality(nationality).build();
+                .nationality(nationality)
+                .books(bookIds)
+                .build();
     }
-
 }

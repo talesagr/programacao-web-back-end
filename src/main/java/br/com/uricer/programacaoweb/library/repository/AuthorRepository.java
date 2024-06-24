@@ -7,9 +7,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AuthorRepository extends JpaRepository<Author, Integer> {
     @Query("SELECT a FROM Author a JOIN a.authorBooks ab WHERE ab.book.id = :bookId")
     List<Author> findAuthorsByBookId(@Param("bookId") Integer bookId);
+    Optional<Author> findByName(String name);
 }
