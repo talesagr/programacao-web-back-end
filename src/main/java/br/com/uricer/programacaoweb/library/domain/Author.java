@@ -29,7 +29,7 @@ public class Author {
     private String bio;
 
     @Column(name = "birth_date")
-    private LocalDate birthDate;
+    private String birthDate;
 
     @Column(name = "nationality")
     private String nationality;

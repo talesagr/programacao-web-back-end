@@ -31,17 +31,9 @@ public class BookService {
     }
 
     public List<BookDTO> getBooks() {
-        List<BookDTO> bookDTOS = new ArrayList<>();
-        List<Book> books = bookRepository.findAll();
-
-        Set<Integer> bookIds = new HashSet<>();
-        for (Book book : books) {
-            if (bookIds.add(book.getId())) {
-                bookDTOS.add(book.toDTO());
-            }
-        }
-
-        return bookDTOS;
+        return bookRepository.findAll().stream()
+                .map(Book::toDTO)
+                .collect(Collectors.toList());
     }
 
     public BookDTO updateBook(Integer bookId, BookDTO bookDTO) {

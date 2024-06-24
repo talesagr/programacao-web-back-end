@@ -17,14 +17,12 @@ import java.util.stream.Collectors;
 
 @Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class AuthorDTO {
 
     private Integer id;
     private String name;
     private String bio;
-    private LocalDate birthDate;
+    private String birthDate;
     private String nationality;
     private List<Integer> books;
 
@@ -33,7 +31,7 @@ public class AuthorDTO {
                 .id(id)
                 .name(name)
                 .bio(bio)
-                .birthDate(validateDate(birthDate))
+                .birthDate(birthDate)
                 .nationality(nationality)
                 .build();
 
@@ -51,11 +49,18 @@ public class AuthorDTO {
         return author;
     }
 
-    private LocalDate validateDate(LocalDate date) {
-        try {
-            return LocalDate.of(date.getYear(), date.getMonth(), date.getDayOfMonth());
-        } catch (DateTimeException e) {
-            throw new IllegalArgumentException("Invalid date: " + date);
-        }
+    public static AuthorDTO fromEntity(Author author) {
+        List<Integer> bookIds = author.getAuthorBooks().stream()
+                .map(authorBook -> authorBook.getBook().getId())
+                .collect(Collectors.toList());
+
+        return AuthorDTO.builder()
+                .id(author.getId())
+                .name(author.getName())
+                .bio(author.getBio())
+                .birthDate(author.getBirthDate())
+                .nationality(author.getNationality())
+                .books(bookIds)
+                .build();
     }
 }

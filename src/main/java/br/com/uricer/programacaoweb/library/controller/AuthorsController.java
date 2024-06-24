@@ -35,7 +35,7 @@ public class AuthorsController {
 
     @PutMapping(path = "/{authorId}")
     public ResponseEntity<AuthorDTO> updateAuthor(@PathVariable Integer authorId, @RequestBody AuthorDTO authorDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(authorService.updateAuthor(authorId, authorDTO));
+        return ResponseEntity.ok().body(authorService.updateAuthor(authorId, authorDTO));
     }
 
     @DeleteMapping(path = "/{authorId}")

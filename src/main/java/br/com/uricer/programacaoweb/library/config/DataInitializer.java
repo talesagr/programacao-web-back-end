@@ -32,7 +32,7 @@ public class DataInitializer {
                     .orElseGet(() -> authorRepository.save(Author.builder()
                             .name("Vladimir Nabokov")
                             .bio("Controversial Author")
-                            .birthDate(LocalDate.of(1899, 4, 22))
+                            .birthDate("22-04-1899")
                             .nationality("Russian-American")
                             .build()));
 

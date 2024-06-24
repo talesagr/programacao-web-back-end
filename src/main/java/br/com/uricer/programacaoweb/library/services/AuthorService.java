@@ -47,7 +47,7 @@ public class AuthorService {
                                 .orElseThrow(() -> new RuntimeException("Book not found: " + bookId));
                         return AuthorBook.builder().author(finalAuthor).book(book).build();
                     })
-                    .collect(Collectors.toList());
+                    .toList();
             author.getAuthorBooks().addAll(authorBooks);
         }
 
@@ -84,9 +84,16 @@ public class AuthorService {
         author.setBirthDate(authorDTO.getBirthDate());
         author.setNationality(authorDTO.getNationality());
 
+        Author finalAuthor = author;
+        List<AuthorBook> authorBooks = authorDTO.getBooks().stream().map(bookId -> {
+            Book book = new Book();
+            book.setId(bookId);
+            return AuthorBook.builder().author(finalAuthor).book(book).build();
+        }).collect(Collectors.toList());
+        author.setAuthorBooks(authorBooks);
+
         author = authorRepository.save(author);
-        AuthorDTO resultDTO = author.toDTO();
-        return resultDTO;
+        return AuthorDTO.fromEntity(author);
     }
 
     public void deleteAuthor(Integer authorId) {
