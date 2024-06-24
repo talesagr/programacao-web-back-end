@@ -8,10 +8,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Data
 @Builder
@@ -31,7 +33,7 @@ public class AuthorDTO {
                 .id(id)
                 .name(name)
                 .bio(bio)
-                .birthDate(birthDate)
+                .birthDate(validateDate(birthDate))
                 .nationality(nationality)
                 .build();
 
@@ -49,4 +51,11 @@ public class AuthorDTO {
         return author;
     }
 
+    private LocalDate validateDate(LocalDate date) {
+        try {
+            return LocalDate.of(date.getYear(), date.getMonth(), date.getDayOfMonth());
+        } catch (DateTimeException e) {
+            throw new IllegalArgumentException("Invalid date: " + date);
+        }
+    }
 }
