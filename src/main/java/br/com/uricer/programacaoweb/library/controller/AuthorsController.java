@@ -1,6 +1,7 @@
 package br.com.uricer.programacaoweb.library.controller;
 
 import br.com.uricer.programacaoweb.library.dto.AuthorDTO;
+import br.com.uricer.programacaoweb.library.dto.BookDTO;
 import br.com.uricer.programacaoweb.library.services.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/authors")
-@CrossOrigin(origins = "http:localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AuthorsController {
 
     @Autowired
@@ -19,13 +20,17 @@ public class AuthorsController {
 
     @PostMapping
     public ResponseEntity<AuthorDTO> createAuthor(@RequestBody AuthorDTO authorDTO) {
-        System.out.println(authorDTO.toString());
         return ResponseEntity.status(HttpStatus.CREATED).body(authorService.createAuthor(authorDTO));
     }
 
     @GetMapping
     public ResponseEntity<List<AuthorDTO>> getAuthors() {
         return ResponseEntity.ok().body(authorService.getAuthors());
+    }
+
+    @GetMapping(path = "/{authorId}/books")
+    public ResponseEntity<List<BookDTO>> getBooksByAuthorId(@PathVariable Integer authorId) {
+        return ResponseEntity.ok().body(authorService.findBooksByAuthorId(authorId));
     }
 
     @PutMapping(path = "/{authorId}")
@@ -37,5 +42,4 @@ public class AuthorsController {
     public void deleteAuthor(@PathVariable Integer authorId) {
         authorService.deleteAuthor(authorId);
     }
-
 }
